@@ -365,7 +365,8 @@ def artefact_experiment(
 
     edits = {}
     for name, edit in HARMLESS_EDITS.items():
-        edited = [edit(url) for url in benign]
+        # A few rows end in stray whitespace, which an appended edit would pull inside.
+        edited = [edit(url.strip()) for url in benign]
         edited_rows = np.hstack([benign_rows, artefact_matrix(edited)])
         edited_naive = predict(naive.booster, edited_rows)
         edited_shipped = np.array(detector.score(edited))

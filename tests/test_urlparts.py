@@ -19,6 +19,14 @@ def test_registered_domain(url: str, expected: str) -> None:
     assert registered_domain(url) == expected
 
 
+def test_www_on_a_public_suffix_host_stays_in_one_group() -> None:
+    assert registered_domain("https://www.gov.uk/x") == registered_domain("https://gov.uk/x")
+
+
+def test_www_dot_tld_is_not_reduced_to_a_bare_suffix() -> None:
+    assert registered_domain("https://www.com/") == "www.com"
+
+
 def test_platform_tenants_share_one_group() -> None:
     """Tenants of one platform must not end up on both sides of a split."""
     assert registered_domain("https://a.github.io") == "github.io"

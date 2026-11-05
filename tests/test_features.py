@@ -59,6 +59,18 @@ def test_collection_artefacts_cannot_change_the_features(variant: str) -> None:
     assert extract(variant) == extract("https://example.com/a/b")
 
 
+@pytest.mark.parametrize(
+    "host",
+    ["www30.example.com", "www2.a.example.co.uk", "wwwabc.example.org", "gov.uk", "a.web.app"],
+)
+def test_adding_www_never_changes_the_features(host: str) -> None:
+    assert extract(f"https://www.{host}/a") == extract(f"https://{host}/a")
+
+
+def test_a_label_starting_with_www_keeps_its_name() -> None:
+    assert value("https://www30.example.com", "subdomain_length") == len("www30")
+
+
 def test_canonical_key_ignores_the_same_fields() -> None:
     assert canonical_key("http://www.example.com/a/?x=1#y") == "example.com/a"
 

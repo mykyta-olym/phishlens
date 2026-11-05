@@ -90,6 +90,12 @@ def _split_domain(host: str) -> tuple[str, str, str, bool]:
     return registered, suffix, prefix, full_suffix != suffix
 
 
+def _without_www(host: str) -> str:
+    """Drop a leading `www.`, so `www.gov.uk` and `gov.uk` parse the same way."""
+    bare = host.removeprefix("www.")
+    return bare if "." in bare else host
+
+
 def _safe_split(text: str) -> SplitResult:
     try:
         return urlsplit(text)
@@ -145,7 +151,7 @@ def parse_url(raw: str) -> UrlParts:
     host = host.lower().rstrip(".")
     kind = classify_host(host)
     if kind == "domain":
-        registered, suffix, subdomain, platform = _split_domain(host)
+        registered, suffix, subdomain, platform = _split_domain(_without_www(host))
     else:
         registered, suffix, subdomain, platform = host, "", "", False
 

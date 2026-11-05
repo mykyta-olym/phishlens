@@ -230,7 +230,7 @@ def extract_parts(parts: UrlParts) -> list[float]:
     registered = parts.registered_domain if is_domain else ""
     suffix = parts.public_suffix if is_domain else ""
     sld = registered[: -len(suffix) - 1] if suffix and registered.endswith("." + suffix) else ""
-    subdomain = parts.subdomain.removeprefix("www").removeprefix(".") if is_domain else ""
+    subdomain = parts.subdomain if is_domain else ""
     labels = host.split(".") if host else []
     segments = [segment for segment in path.split("/") if segment]
     last_segment = segments[-1] if segments else ""

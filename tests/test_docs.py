@@ -31,9 +31,11 @@ def test_metrics_describe_the_shipped_model() -> None:
     assert report["quick_run"] is False
 
 
-def test_the_shuffled_label_check_found_no_leak() -> None:
+def test_shuffled_labels_remove_almost_all_of_the_score() -> None:
     report = json.loads(METRICS.read_text(encoding="utf-8"))
-    assert abs(report["checks"]["shuffled_labels"]["roc_auc"] - 0.5) < 0.05
+    check = report["checks"]["shuffled_labels"]
+    assert len(check["roc_auc_values"]) >= 20
+    assert abs(check["roc_auc_mean"] - 0.5) < 0.03
 
 
 def test_no_train_test_overlap_was_recorded() -> None:

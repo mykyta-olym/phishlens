@@ -2,11 +2,11 @@
   "version": "0.1.0",
   "trained_at": "2026-11-05",
   "seed": 42,
-  "model_sha256": "69259c38ce888c6366602af70cc00cbd0ff5c3f143f5819a94f7bc367fa4c7ad",
-  "training_rows": 430003,
-  "validation_rows": 52837,
-  "threshold": 0.42,
-  "strict_threshold": 0.780031,
+  "model_sha256": "7a7a9f25e752b25eaf7f5a0059e3f6defa2450e09efee7f36668397daf0f4b2d",
+  "training_rows": 426508,
+  "validation_rows": 56332,
+  "threshold": 0.435,
+  "strict_threshold": 0.771141,
   "features": [
     "host_length",
     "path_length",
@@ -62,35 +62,35 @@
   "self_check": [
     {
       "url": "https://example.com/",
-      "score": 0.3787847667556475
+      "score": 0.4192185481048529
     },
     {
       "url": "https://www.example.org/about/team",
-      "score": 0.03415464405162374
+      "score": 0.04186515073501137
     },
     {
       "url": "http://paypal.secure-login.example.com/verify/account",
-      "score": 0.7194392330347779
+      "score": 0.6007694935758277
     },
     {
       "url": "https://account-update.example.net/signin.php",
-      "score": 0.3848403866595117
+      "score": 0.3528898608011646
     },
     {
       "url": "http://192.0.2.10/login",
-      "score": 0.9840140304039015
+      "score": 0.9786430023704028
     },
     {
       "url": "https://tinyurl.com/abc123",
-      "score": 0.9618527505333697
+      "score": 0.9682974369539128
     },
     {
       "url": "https://user-a1b2c3.pages.dev/",
-      "score": 0.993064009228795
+      "score": 0.9918089118044742
     },
     {
       "url": "https://docs.example.co.uk/guide/getting-started.html",
-      "score": 0.00835244361217329
+      "score": 0.008719154214364639
     }
   ]
 }
