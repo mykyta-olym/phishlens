@@ -18,6 +18,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 METRICS = ROOT / "reports" / "metrics.json"
+PREVIOUS = ROOT / "reports" / "before_parser_fix.json"
 EVALUATION = ROOT / "reports" / "EVALUATION.md"
 README = ROOT / "README.md"
 START = "<!-- results:start -->"
@@ -101,6 +102,8 @@ def render_readme_block(report: dict[str, Any]) -> str:
         key=lambda name: baselines[name][unseen_key]["roc_auc"],
     )
     slices = report["slices"]["future_all_domains"]
+    artefact = report["artefacts"]
+    tracking = artefact["benign_flagged_after_edit"]["add ?utm_source=newsletter"]
     parts = [
         headline(report),
         "",
@@ -113,6 +116,12 @@ def render_readme_block(report: dict[str, Any]) -> str:
         f"F1 {num(baselines[best][unseen_key]['f1'])}. "
         f"On Hannousse it reached ROC AUC {num(baselines[best]['hannousse']['roc_auc'])}, "
         f"and on PhiUSIIL {num(baselines[best]['phiusiil']['roc_auc'])}.",
+        "",
+        f"Harmless edit test on {artefact['benign_rows_edited']:,} benign URLs: a naive model "
+        f"that sees the excluded fields scores F1 {num(artefact['naive_model']['f1'])} on the "
+        f"top row's data, and flags {pct(artefact['benign_flagged_before_edit']['naive_flagged'])} "
+        f"of them. Add `?utm_source=newsletter` and it flags {pct(tracking['naive_flagged'])}. "
+        f"The shipped model flags {pct(tracking['shipped_flagged'])} either way.",
         "",
         "Precision on the dataset's own benchmark sets at realistic prevalence:",
         "",
@@ -447,6 +456,54 @@ def calibration(report: dict[str, Any]) -> str:
     return table(["Score band", "Rows", "Mean score", "Observed phishing share"], rows)
 
 
+def shuffled(report: dict[str, Any]) -> str:
+    check = report["checks"]["shuffled_labels"]
+    values = check["roc_auc_values"]
+    above = sum(value > 0.5 for value in values)
+    below = sum(value < 0.5 for value in values)
+    return (
+        f"With shuffled training labels, ROC AUC on the test rows over {len(values)} seeds had "
+        f"mean {num(check['roc_auc_mean'])}, from {num(min(values))} to {num(max(values))}, with "
+        f"{above} seeds above 0.5 and {below} below. So the real score depends on the real "
+        f"labels. The spread is wide for this many rows, probably because a model fitted to "
+        f"noise is still a function of strongly clustered features, so one seed proves little. "
+        f"The first seed alone gave {num(values[0])}."
+    )
+
+
+def retraining_note(report: dict[str, Any]) -> str:
+    """Disclose that the test split was scored before the final retrain."""
+    previous = json.loads(PREVIOUS.read_text(encoding="utf-8"))
+    rows = []
+    for name, key in (
+        ("later dates, unseen domains", "future_unseen_domains"),
+        ("later dates, all rows", "future_all_domains"),
+    ):
+        before = previous[key]
+        after = report["main"][key]["metrics"]
+        for metric in ("precision", "recall", "f1", "roc_auc"):
+            rows.append(
+                [
+                    name,
+                    metric,
+                    num(before[metric]),
+                    num(after[metric]),
+                    f"{after[metric] - before[metric]:+.3f}",
+                ]
+            )
+    return (
+        "The test split was scored on an earlier model before this one. The harmless-edit "
+        "check in that run exposed a parsing bug: hosts such as `www30.example.com` lost part "
+        "of their subdomain, so adding `www.` changed the features. The bug was fixed and the "
+        "model retrained with unchanged settings. The fix came from an equality test, not from "
+        "a score, and no feature or setting was chosen because of test results. It also "
+        "moved the seeded validation split, so the threshold moved from "
+        f"{previous['threshold']} to {report['main']['threshold']}. That means this test split is "
+        "no longer strictly unseen by the author, and the table below shows what changed.\n\n"
+        + table(["Test set", "Metric", "Before fix", "Final", "Change"], rows)
+    )
+
+
 def render_evaluation(report: dict[str, Any]) -> str:
     data = report["data"]
     cleaning = data["cleaning"]
@@ -464,10 +521,12 @@ The model was fitted on PhreshPhish `train` rows dated {data["train_dates"][0]} 
 {data["test_dates"][0]} to {data["test_dates"][1]}, which the model never saw. The headline
 test also removes every row whose registered domain occurs anywhere in the training split.
 
-Design decisions used validation rows from the training period only. The test split was
-scored once the model was frozen. The audit below looked at class rates over all rows
-before features were written, so the choice of excluded fields is not blind to the test
-split, but no test score informed it. Thresholds were chosen on validation domains.
+Design decisions used validation rows from the training period only. The audit below
+looked at class rates over all rows before features were written, so the choice of
+excluded fields is not blind to the test split, but no test score informed it. Thresholds
+were chosen on validation domains.
+
+{retraining_note(report)}
 
 Rows: {cleaning["rows_in"]:,} in, {cleaning["duplicates"]:,} duplicates removed after
 canonicalising, {cleaning["label_conflicts"]:,} rows dropped because one canonical URL carried
@@ -492,9 +551,11 @@ The rule flags everything except `https://www.<host>` with no path. It uses no l
 ## Baselines
 
 Each baseline used the same fit rows, and a threshold picked the same way on validation.
-The model was chosen before the test split was scored and was not changed after it. A
-baseline that wins here is reported as a win. Swapping it in would turn the test split
-into a selection set, so its numbers could no longer be called held out.
+The model design was fixed before the test split was first scored. During development the n-gram
+baseline and LightGBM looked close on a time-based cut of the training data, a comparison
+not recorded in metrics.json, and LightGBM was kept because it explains a score in named
+URL properties. The table shows the n-gram baseline ahead on every column. Swapping it in
+now would turn the test split into a selection set, so the result is reported instead.
 
 {baselines(report)}
 
@@ -536,11 +597,7 @@ rows in the data.
 
 ## Checks
 
-With shuffled training labels, ROC AUC on the test rows over several seeds was
-{", ".join(num(value) for value in report["checks"]["shuffled_labels"]["roc_auc_values"])},
-mean {num(report["checks"]["shuffled_labels"]["roc_auc_mean"])}. One run can land off 0.5,
-because a model fitted to noise is still a fixed function of strongly clustered features.
-A leak would stay on one side of 0.5 across seeds.
+{shuffled(report)}
 
 Removing feature groups, on later dates and unseen domains:
 

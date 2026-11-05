@@ -8,6 +8,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
+from phishlens.cli import main
 from phishlens.model import Detector
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -48,6 +51,13 @@ def test_harmless_edits_changed_nothing_for_the_shipped_model() -> None:
     before = block["benign_flagged_before_edit"]["shipped_flagged"]
     for edit in block["benign_flagged_after_edit"].values():
         assert edit["shipped_flagged"] == before
+
+
+def test_the_readme_sample_is_real_output(capsys: pytest.CaptureFixture[str]) -> None:
+    url = "http://paypal.secure-login.example.com/verify/account.php"
+    assert main(["score", "--top", "3", url]) == 0
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert capsys.readouterr().out.strip() in text
 
 
 def test_the_readme_warns_that_this_is_not_a_sole_control() -> None:
