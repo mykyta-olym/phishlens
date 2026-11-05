@@ -73,9 +73,10 @@ def load_phiusiil(raw_dir: Path = DEFAULT_RAW_DIR) -> pd.DataFrame:
 def load_legitphish(raw_dir: Path = DEFAULT_RAW_DIR) -> pd.DataFrame:
     path = raw_dir / "legitphish" / "url_features_extracted1.csv"
     frame = _read_csv(path, ["URL", "ClassLabel"]).rename(columns={"URL": "url"})
-    # The file stores the label as a float. 0 is phishing per the dataset description.
-    frame["label"] = (frame.pop("ClassLabel").astype(float) == 0.0).astype("int8")
-    _check_counts("legitphish", frame, 63678, 37541)
+    # One row has no label. 0 is phishing per the dataset description.
+    frame = frame[frame["ClassLabel"] != ""].reset_index(drop=True)
+    frame["label"] = (frame.pop("ClassLabel") == "0").astype("int8")
+    _check_counts("legitphish", frame, 63678, 37540)
     return frame
 
 

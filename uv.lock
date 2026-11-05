@@ -686,6 +686,7 @@ dev = [
 train = [
     { name = "aiohttp" },
     { name = "fsspec" },
+    { name = "joblib" },
     { name = "pandas" },
     { name = "pyarrow" },
     { name = "scikit-learn" },
@@ -712,6 +713,7 @@ dev = [
 train = [
     { name = "aiohttp" },
     { name = "fsspec" },
+    { name = "joblib", specifier = ">=1.6.0" },
     { name = "pandas" },
     { name = "pyarrow" },
     { name = "scikit-learn" },

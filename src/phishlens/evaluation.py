@@ -389,11 +389,17 @@ def artefact_experiment(
 # External datasets -------------------------------------------------------------------
 
 
+def external_rows(frame: pd.DataFrame, seen: NDArray[np.str_]) -> pd.DataFrame:
+    """Clean an outside dataset and drop every domain seen in training."""
+    cleaned, _ = clean(frame)
+    return cleaned[~cleaned["domain"].isin(seen)].reset_index(drop=True)
+
+
 def external_test(
     frame: pd.DataFrame, seen: NDArray[np.str_], detector: Detector, seed: int
 ) -> dict[str, Any]:
     cleaned, report = clean(frame)
-    kept = cleaned[~cleaned["domain"].isin(seen)].reset_index(drop=True)
+    kept = external_rows(frame, seen)
     labels = labels_of(kept)
     scores = np.array(detector.score(kept["url"].tolist()))
     return {
@@ -497,14 +503,22 @@ def shuffled_label_check(
     test: pd.DataFrame,
     test_rows: NDArray[np.float32],
     seed: int,
+    repeats: int,
 ) -> dict[str, Any]:
-    """With labels shuffled, nothing is left to learn. AUC far from 0.5 means a leak."""
-    labels = labels_of(train).copy()
-    np.random.default_rng(seed).shuffle(labels)
-    weights = np.ones(len(labels), dtype=np.float32)
-    booster = fit_booster(rows, labels, weights, seed, rounds=SHUFFLE_ROUNDS)
-    scores = predict(booster, test_rows)
-    return {"roc_auc": full_metrics(labels_of(test), scores, 0.5)["roc_auc"]}
+    """With labels shuffled, nothing is left to learn, so AUC should centre on 0.5.
+
+    One run is not enough. A model fitted to noise is still a fixed function of the
+    features, and test rows cluster strongly by feature, so a single run can land some
+    way off 0.5 by chance. A leak would stay on one side across seeds.
+    """
+    weights = np.ones(len(train), dtype=np.float32)
+    values = []
+    for repeat in range(repeats):
+        labels = labels_of(train).copy()
+        np.random.default_rng(seed + repeat).shuffle(labels)
+        booster = fit_booster(rows, labels, weights, seed + repeat, rounds=SHUFFLE_ROUNDS)
+        values.append(full_metrics(labels_of(test), predict(booster, test_rows), 0.5)["roc_auc"])
+    return {"roc_auc_mean": round(float(np.mean(values)), 4), "roc_auc_values": values}
 
 
 def ablation(
@@ -653,14 +667,23 @@ def run_evaluation(
     report["source_audit"] = audit_sources(raw_dir)
     log("sources audited")
 
+    outside = {
+        name: external_rows(loader(raw_dir), seen)
+        for name, loader in (("hannousse", load_hannousse), ("phiusiil", load_phiusiil))
+    }
     report["baselines"] = run_baselines(
         train,
         rows,
         fit,
         validation,
         {
+            "validation": (train.iloc[validation], rows[validation]),
             "future_unseen_domains": (unseen, unseen_rows),
             "future_all_domains": (test, test_rows),
+            **{
+                name: (frame, feature_matrix(frame["url"].tolist()))
+                for name, frame in outside.items()
+            },
         },
         seed,
     )
@@ -697,7 +720,7 @@ def run_evaluation(
     }
 
     report["checks"] = {
-        "shuffled_labels": shuffled_label_check(train, rows, unseen, unseen_rows, seed),
+        "shuffled_labels": shuffled_label_check(train, rows, unseen, unseen_rows, seed, repeats),
     }
     report["ablation"] = ablation(train, rows, unseen, unseen_rows, seed)
     report["importance"] = feature_importance(detector, unseen["url"].tolist(), seed)

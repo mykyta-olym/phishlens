@@ -25,6 +25,7 @@ train = [
     "pandas",
     "pyarrow",
     "scikit-learn",
+    "joblib>=1.6.0",
 ]
 dev = [
     "httpx2>=2.16.0",

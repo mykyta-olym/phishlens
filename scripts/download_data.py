@@ -239,7 +239,8 @@ def main() -> int:
             download_columns(name, source, target_dir, args.update_pins, args.force)
 
     if args.update_pins:
-        MANIFEST.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+        text = json.dumps(manifest, indent=2) + "\n"
+        MANIFEST.write_text(text, encoding="utf-8", newline="\n")
     return 0
 
 

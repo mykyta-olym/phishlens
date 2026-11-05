@@ -122,6 +122,8 @@ class Detector:
         except (OSError, ValueError) as error:
             raise ModelError(f"cannot read the model in {directory}: {error}") from error
 
+        # This must run before parsing. A damaged file does not raise in LightGBM: its
+        # native parser can abort the whole process, which no `except` here would catch.
         digest = hashlib.sha256(model_bytes).hexdigest()
         if digest != metadata.get("model_sha256"):
             raise ModelError(f"{model_path} does not match the checksum in {METADATA_FILE}")
