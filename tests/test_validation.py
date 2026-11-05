@@ -49,6 +49,11 @@ def test_rejects(url: str, reason: str) -> None:
         validate_url(url)
 
 
+def test_lone_surrogate_is_rejected() -> None:
+    with pytest.raises(InvalidUrlError, match="Unicode"):
+        validate_url("https://example.com/" + chr(0xD800))
+
+
 def test_length_limit_is_exact() -> None:
     prefix = "https://example.com/"
     validate_url(prefix + "a" * (MAX_URL_LENGTH - len(prefix)))

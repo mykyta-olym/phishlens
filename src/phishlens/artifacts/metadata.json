@@ -1,0 +1,96 @@
+{
+  "version": "0.1.0",
+  "trained_at": "2026-11-05",
+  "seed": 42,
+  "model_sha256": "69259c38ce888c6366602af70cc00cbd0ff5c3f143f5819a94f7bc367fa4c7ad",
+  "training_rows": 430003,
+  "validation_rows": 52837,
+  "threshold": 0.42,
+  "strict_threshold": 0.780031,
+  "features": [
+    "host_length",
+    "path_length",
+    "subdomain_depth",
+    "max_host_label_length",
+    "host_hyphen_count",
+    "host_digit_ratio",
+    "is_ip_host",
+    "is_punycode",
+    "has_non_ascii_host",
+    "has_userinfo",
+    "is_platform_host",
+    "is_shortener",
+    "suffix_label_count",
+    "tld_id",
+    "sld_length",
+    "sld_entropy",
+    "sld_digit_ratio",
+    "sld_hyphen_count",
+    "sld_vowel_ratio",
+    "sld_consonant_run",
+    "subdomain_length",
+    "subdomain_entropy",
+    "subdomain_digit_ratio",
+    "path_depth",
+    "max_segment_length",
+    "path_digit_ratio",
+    "path_entropy",
+    "path_hyphen_count",
+    "path_underscore_count",
+    "path_dot_count",
+    "path_uppercase_ratio",
+    "path_percent_count",
+    "file_kind",
+    "has_random_token",
+    "has_double_slash",
+    "path_has_embedded_url",
+    "host_keyword_count",
+    "path_keyword_count",
+    "brand_in_subdomain",
+    "brand_in_name",
+    "brand_in_path",
+    "brand_official_domain",
+    "brand_lookalike"
+  ],
+  "limits": [
+    "Reads only the URL string, so it cannot see page content, certificates or reputation.",
+    "A low score is not evidence of safety.",
+    "URL shorteners hide the destination, so their scores carry almost no information.",
+    "Compromised legitimate sites look like ordinary URLs and are often missed.",
+    "It must not be the only control."
+  ],
+  "self_check": [
+    {
+      "url": "https://example.com/",
+      "score": 0.3787847667556475
+    },
+    {
+      "url": "https://www.example.org/about/team",
+      "score": 0.03415464405162374
+    },
+    {
+      "url": "http://paypal.secure-login.example.com/verify/account",
+      "score": 0.7194392330347779
+    },
+    {
+      "url": "https://account-update.example.net/signin.php",
+      "score": 0.3848403866595117
+    },
+    {
+      "url": "http://192.0.2.10/login",
+      "score": 0.9840140304039015
+    },
+    {
+      "url": "https://tinyurl.com/abc123",
+      "score": 0.9618527505333697
+    },
+    {
+      "url": "https://user-a1b2c3.pages.dev/",
+      "score": 0.993064009228795
+    },
+    {
+      "url": "https://docs.example.co.uk/guide/getting-started.html",
+      "score": 0.00835244361217329
+    }
+  ]
+}

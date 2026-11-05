@@ -17,11 +17,22 @@ class InvalidUrlError(ValueError):
     """The input cannot be scored. The message is safe to show to the caller."""
 
 
+def _is_encodable(text: str) -> bool:
+    """False for lone surrogates, which JSON can carry but UTF-8 cannot."""
+    try:
+        text.encode("utf-8")
+    except UnicodeEncodeError:
+        return False
+    return True
+
+
 def validate_url(value: str) -> str:
     """Return the stripped URL, or raise `InvalidUrlError` with a plain reason."""
     text = value.strip()
     if not text:
         raise InvalidUrlError("the URL is empty")
+    if not _is_encodable(text):
+        raise InvalidUrlError("the URL is not valid Unicode text")
     if len(text) > MAX_URL_LENGTH:
         raise InvalidUrlError(f"the URL is longer than {MAX_URL_LENGTH} characters")
     if any(char.isspace() or ord(char) < 32 or ord(char) == 127 for char in text):

@@ -27,7 +27,7 @@ train = [
     "scikit-learn",
 ]
 dev = [
-    "httpx",
+    "httpx2>=2.16.0",
     "mypy",
     "pandas-stubs",
     "pytest",
