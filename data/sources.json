@@ -1,0 +1,81 @@
+{
+  "phreshphish": {
+    "title": "PhreshPhish",
+    "role": "training, validation and the main held-out test",
+    "kind": "huggingface_columns",
+    "authors": "Dalton, Gowda, Rao, Pargi, Hadj Khodabakhshi, Rombs, Jou, Marwah",
+    "citation": "PhreshPhish: A Real-World, High-Quality, Large-Scale Phishing Website Dataset and Benchmark. arXiv:2507.10854, 2025.",
+    "homepage": "https://huggingface.co/datasets/phreshphish/phreshphish",
+    "license": "CC-BY-4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "terms": "The dataset card adds that the data should only be used for anti-phishing research.",
+    "repo": "phreshphish/phreshphish",
+    "revision": "eca603e0ecd4f698f8d4d226c088659e72681239",
+    "parquet_files": {
+      "train": 56,
+      "test": 21
+    },
+    "columns": [
+      "sha256",
+      "url",
+      "label",
+      "target",
+      "date"
+    ],
+    "benchmarks": {
+      "benchmark-005": 586,
+      "benchmark-010": 296,
+      "benchmark-050": 59,
+      "benchmark-100": 29,
+      "benchmark-500": 5
+    },
+    "output": "rows.csv.gz",
+    "benchmark_output": "benchmarks.csv.gz",
+    "rows": 666315,
+    "benchmark_rows": 248649,
+    "content_sha256": "18c71071a8bda89af3654a5777191d261c5b2c2a91388d3669e7a139c9739653",
+    "benchmark_content_sha256": "e5c2a055ac56c24df70b84b53c0f307b9ecdbf8c915274902ec7a311c8613c40"
+  },
+  "hannousse": {
+    "title": "Web page phishing detection (dataset_B)",
+    "role": "external test only, collected in May 2020",
+    "kind": "file",
+    "authors": "Hannousse, Yahiouche",
+    "citation": "Web page phishing detection. Mendeley Data, V3. doi:10.17632/c2gw7fy2j4.3",
+    "homepage": "https://data.mendeley.com/datasets/c2gw7fy2j4/3",
+    "license": "CC-BY-4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "url": "https://data.mendeley.com/public-files/datasets/c2gw7fy2j4/files/575316f4-ee1d-453e-a04f-7b950915b61b/file_downloaded",
+    "output": "dataset_B_05_2020.csv",
+    "sha256": "21093e2902e5441c86a6daf95e86e7c332046e477fdf109a579d7bd81e586d6c",
+    "size": 3661166
+  },
+  "phiusiil": {
+    "title": "PhiUSIIL Phishing URL Dataset",
+    "role": "audit and external test only, because its URL strings carry a collection artefact",
+    "kind": "file",
+    "authors": "Prasad, Chandra",
+    "citation": "PhiUSIIL: A diverse security profile empowered phishing URL detection framework based on similarity index and incremental learning. Computers and Security, 103545, 2023. doi:10.1016/j.cose.2023.103545. Data: Mendeley Data, V2. doi:10.17632/shwpxscxy2.2",
+    "homepage": "https://data.mendeley.com/datasets/shwpxscxy2/2",
+    "license": "CC-BY-4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "url": "https://data.mendeley.com/public-files/datasets/shwpxscxy2/files/efc8e181-6ed0-41c5-960c-ed1377367b24/file_downloaded",
+    "output": "PhiUSIIL_Phishing_URL_Dataset.csv",
+    "sha256": "a236549cd369cd80bd478ff8e1779cbf44c58d5c3f79f7a51a1adbed7d06d1c6",
+    "size": 56854345
+  },
+  "legitphish": {
+    "title": "LegitPhish Dataset",
+    "role": "audit only, because its positive class is mostly malware delivery URLs",
+    "kind": "file",
+    "authors": "Potpelwar",
+    "citation": "LegitPhish Dataset. Mendeley Data, V1. doi:10.17632/hx4m73v2sf.1",
+    "homepage": "https://data.mendeley.com/datasets/hx4m73v2sf/1",
+    "license": "CC-BY-4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "url": "https://data.mendeley.com/public-files/datasets/hx4m73v2sf/files/0ed51e4d-d160-4047-b650-3f0801eea4aa/file_downloaded",
+    "output": "url_features_extracted1.csv",
+    "sha256": "8685e7901c3b4e73eb43c106cb166cc932dd14f76960a032c713c2c32f09dbcd",
+    "size": 8963838
+  }
+}
