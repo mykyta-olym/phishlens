@@ -218,6 +218,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0] if __doc__ else None)
     parser.add_argument("names", nargs="*", help="sources to fetch, default all")
     parser.add_argument("--force", action="store_true", help="rebuild extracts that exist")
+    parser.add_argument("--raw-dir", type=Path, default=RAW_DIR, help="where to put the files")
     parser.add_argument(
         "--update-pins", action="store_true", help="record new extract hashes in the manifest"
     )
@@ -231,7 +232,7 @@ def main() -> int:
 
     for name in names:
         source = manifest[name]
-        target_dir = RAW_DIR / name
+        target_dir = args.raw_dir / name
         target_dir.mkdir(parents=True, exist_ok=True)
         if source["kind"] == "file":
             download_file(name, source, target_dir)

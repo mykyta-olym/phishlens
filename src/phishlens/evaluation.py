@@ -71,6 +71,7 @@ Floats = NDArray[np.float64]
 LEAKAGE_REPEATS = 5
 LEAKAGE_TEST_SHARE = 0.2
 SHUFFLE_ROUNDS = 100
+SHUFFLE_REPEATS = 20
 IMPORTANCE_SAMPLE = 20000
 NGRAM_ALPHA = 1e-6
 NGRAM_EPOCHS = 15
@@ -505,11 +506,11 @@ def shuffled_label_check(
     seed: int,
     repeats: int,
 ) -> dict[str, Any]:
-    """With labels shuffled, nothing is left to learn, so AUC should centre on 0.5.
+    """Refit on shuffled labels, so the training labels carry no information.
 
-    One run is not enough. A model fitted to noise is still a fixed function of the
-    features, and test rows cluster strongly by feature, so a single run can land some
-    way off 0.5 by chance. A leak would stay on one side across seeds.
+    Scores should then fall to chance. Several seeds are used because one run moves
+    a long way: a model fitted to noise is still a function of the features, and test
+    rows cluster strongly by feature.
     """
     weights = np.ones(len(train), dtype=np.float32)
     values = []
@@ -720,7 +721,9 @@ def run_evaluation(
     }
 
     report["checks"] = {
-        "shuffled_labels": shuffled_label_check(train, rows, unseen, unseen_rows, seed, repeats),
+        "shuffled_labels": shuffled_label_check(
+            train, rows, unseen, unseen_rows, seed, 2 if quick else SHUFFLE_REPEATS
+        ),
     }
     report["ablation"] = ablation(train, rows, unseen, unseen_rows, seed)
     report["importance"] = feature_importance(detector, unseen["url"].tolist(), seed)
