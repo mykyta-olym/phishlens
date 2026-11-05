@@ -220,7 +220,8 @@ def main_results(report: dict[str, Any]) -> str:
                 f"{num(metrics['roc_auc'])} ({span(interval['roc_auc'])})",
                 num(metrics["average_precision"]),
                 pct(metrics["false_positive_rate"]),
-                f"TP {matrix['tp']:,}, FP {matrix['fp']:,}, TN {matrix['tn']:,}, FN {matrix['fn']:,}",
+                f"TP {matrix['tp']:,}, FP {matrix['fp']:,}, "
+                f"TN {matrix['tn']:,}, FN {matrix['fn']:,}",
                 f"P {num(strict['precision'])}, R {num(strict['recall'])}, "
                 f"FPR {pct(strict['false_positive_rate'])}",
             ]
