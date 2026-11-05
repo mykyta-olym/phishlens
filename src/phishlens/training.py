@@ -186,7 +186,8 @@ def save_model(model: TrainedModel, output_dir: Path, seed: int) -> None:
             for url, value in zip(SELF_CHECK_URLS, raw, strict=True)
         ],
     }
-    (output_dir / METADATA_FILE).write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
+    text = json.dumps(metadata, indent=2) + "\n"
+    (output_dir / METADATA_FILE).write_text(text, encoding="utf-8", newline="\n")
 
 
 def load_training_frame(raw_dir: Path) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, int]]:

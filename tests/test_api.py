@@ -138,7 +138,7 @@ def test_lone_surrogate_is_rejected_cleanly(client: TestClient) -> None:
 def test_lone_surrogate_in_a_field_name_is_rejected_cleanly(client: TestClient) -> None:
     response = client.post(
         "/v1/score",
-        content=b'{"url": "https://example.com", "\ud800": 1}',
+        content=b'{"url": "https://example.com", "\\ud800": 1}',
         headers={"content-type": "application/json"},
     )
     assert response.status_code == 422

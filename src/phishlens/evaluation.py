@@ -704,6 +704,7 @@ def run_evaluation(
     report["throughput"] = measure_throughput(detector, unseen["url"].tolist())
 
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    text = json.dumps(report, indent=2) + "\n"
+    output.write_text(text, encoding="utf-8", newline="\n")
     log(f"wrote {output}")
     return report
